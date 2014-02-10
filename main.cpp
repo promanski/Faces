@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
   // 200 calculations of PCA
   for(int i = 0; i < 16; i++) {
     double eta = 0.001;
-    for(int j = 0; j < 200; j++) {
+    for(int j = 0; j < 5; j++) {
       for(int g = 0; g < 400; g++) {
         double p = PCAs[g][i];
         
