@@ -22,6 +22,8 @@ int main(int argc, char** argv) {
     return -1;
   }
   
+  srand(time(NULL));
+  
   // Getting database path
   string orl_database_path = argv[1];
   string output_path = argv[2];
@@ -86,6 +88,28 @@ int main(int argc, char** argv) {
       images[i][px] = images[i][px] - mean_face_normalized[px];
     }
   }
+  
+  // Initialise weights
+  vector< vector< double > > weights;
+  for(int i = 0; i < 16; i++) {
+    vector<double> tmp;
+    for(int j = 0; j < 112*92; j++) {
+      tmp.push_back(((((double) rand()*2 / RAND_MAX)) - 1)*0.1);
+    }
+    weights.push_back(tmp);
+  }
+  
+  vector<double> PCAs;
+
+  // Calculate first PCA
+  for(int i = 0; i < 16; i++) {
+    double p = 0;
+    for(int j = 0; j < 112*92; j++) {
+      p += weights[i][j] * images[i][j];
+    }
+  }
+  
+  // TODO 200 calculations of PCA
   
   
   return 0;
