@@ -2,6 +2,7 @@
 #include <string>   // for strings
 #include <iomanip>  // for controlling float print precision
 #include <sstream>  // string to number conversion
+#include <fstream>  // for file operations
 #include <cstdio>
 #include <cmath>
 #include <vector>   // civilized way for storing multiple values...
@@ -99,18 +100,67 @@ int main(int argc, char** argv) {
     weights.push_back(tmp);
   }
   
-  vector<double> PCAs;
+  vector< vector< double > > PCAs;
 
   // Calculate first PCA
+  for(int g = 0; g < 400; g++) {
+    vector<double> tmp;
+    for(int i = 0; i < 16; i++) {
+      double p = 0;
+      for(int j = 0; j < 112*92; j++) {
+        p += weights[i][j] * images[i][j];
+      }
+      tmp.push_back(p);
+    }
+    PCAs.push_back(tmp);
+  }
+  
+  // 200 calculations of PCA
   for(int i = 0; i < 16; i++) {
-    double p = 0;
-    for(int j = 0; j < 112*92; j++) {
-      p += weights[i][j] * images[i][j];
+    double eta = 0.001;
+    for(int j = 0; j < 200; j++) {
+      for(int g = 0; g < 400; g++) {
+        double p = PCAs[g][i];
+        
+        // adaptacja wag
+        for(int k = 0; k < 112*92; k++) {
+          double x = images[g][k];
+
+          double fix = 0;
+          //poprawka Oja
+          for (int o = 0; o <= i; o++) {
+              fix += weights[i][k] * PCAs[g][i];
+          }
+
+          double dtmp = weights[i][k] + eta * p * (x - fix);
+          weights[i][k] = dtmp;
+        }
+        
+        p = 0;
+        
+        for(int k = 0; k < 112*92; k++) {
+          p += weights[i][k] * images[g][k];
+        }
+        
+        PCAs[g][i] = p;
+        
+      }
+      eta *= 0.99;
     }
   }
   
-  // TODO 200 calculations of PCA
+  // TODO Save to file
   
+  ofstream file;
+  file.open("data.csv");
+  for(int g = 0; g < 400; g++) {
+    for(int i = 0; i < 16; i++) {
+      file << PCAs[g][i] << ", ";
+    }
+    file << ((int) (g / 10)) + 1;
+    file << endl;
+  }
+  file.close();
   
   return 0;
 }
