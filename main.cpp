@@ -25,6 +25,9 @@ int main(int argc, char** argv) {
     return -1;
   }
   
+  Mat mean_face;
+  int faces_counter = 0;
+  
   for(int class_counter = 1; class_counter <= 40; class_counter++) {
     // Getting class database path
     stringstream sstream;
@@ -39,12 +42,24 @@ int main(int argc, char** argv) {
       sstream2 << class_path << "/" << image_counter << ".pgm";
       sstream2 >> image_path;
       
+      // Get image
       Mat image;
       image = imread(image_path, CV_LOAD_IMAGE_COLOR);
-      namedWindow( "Display window", WINDOW_AUTOSIZE );// Create a window for display.
-      imshow( "Display window", image );                   // Show our image inside it.
-      waitKey(0); 
       
+      
+      // Add to mean face
+      if(faces_counter == 0) {
+        mean_face = image;
+      } else {
+        image = image / (faces_counter + 1);
+        mean_face = image + mean_face * (1.0 * faces_counter/(faces_counter+1));
+      }
+      
+      //Display mean face so far
+      namedWindow("Mean face", WINDOW_AUTOSIZE);
+      imshow("Mean face", mean_face);
+      waitKey(0); 
+      faces_counter++;
     }
   }
   
