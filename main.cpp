@@ -4,6 +4,7 @@
 #include <sstream>  // string to number conversion
 #include <cstdio>
 #include <cmath>
+#include <vector>   // civilized way for storing multiple values...
 
 
 #include <opencv2/core/core.hpp>        // Basic OpenCV structures (cv::Mat, Scalar)
@@ -16,14 +17,17 @@ using namespace cv;
 
 int main(int argc, char** argv) {
   
-  // Getting database path
-  string orl_database_path;
-  
-  if(argc > 1) orl_database_path = argv[1];
-  else {
+  if(argc < 3) {
     cout << "Usage: Faces <path_to_orl_faces_database>";
     return -1;
   }
+  
+  // Getting database path
+  string orl_database_path = argv[1];
+  string output_path = argv[2];
+  
+  // Images
+  vector< vector< double > > images;
   
   Mat mean_face;
   int faces_counter = 0;
@@ -46,20 +50,40 @@ int main(int argc, char** argv) {
       Mat image;
       image = imread(image_path, CV_LOAD_IMAGE_COLOR);
       
+      vector<double> img_normalized;
+      
+      // Normalize faces to 0-1
+      for(int px = 0; px < 92*112*3; px += 3) {
+        img_normalized.push_back(1.0 * image.data[px] / 255);
+      }
+      
+      images.push_back(img_normalized);
       
       // Add to mean face
       if(faces_counter == 0) {
         mean_face = image;
       } else {
-        image = image / (faces_counter + 1);
-        mean_face = image + mean_face * (1.0 * faces_counter/(faces_counter+1));
+        mean_face = image / (faces_counter + 1) + mean_face * (1.0 * faces_counter/(faces_counter+1));
       }
-      
-      //Display mean face so far
-      namedWindow("Mean face", WINDOW_AUTOSIZE);
-      imshow("Mean face", mean_face);
-      waitKey(0); 
       faces_counter++;
+    }
+  }
+      
+  //Display mean face so far
+  namedWindow("Mean face", WINDOW_AUTOSIZE);
+  imshow("Mean face", mean_face);
+  waitKey(0); 
+  
+  // Normalize mean face to 0-1
+  vector<double> mean_face_normalized;
+  for(int px = 0; px < 92*112*3; px += 3) {
+    mean_face_normalized.push_back(1.0 * mean_face.data[px] / 255);
+  }
+  
+  // Remove mean face
+  for(int i = 0; i < faces_counter; i++) {
+    for(int px = 0; px < 92*112; px++) {
+      images[i][px] = images[i][px] - mean_face_normalized[px];
     }
   }
   

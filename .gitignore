@@ -17,3 +17,6 @@
 
 # Śmiecie
 *~
+
+*.pca
+*.dat
