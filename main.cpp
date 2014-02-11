@@ -114,7 +114,6 @@ int main(int argc, char** argv) {
     }
     PCAs.push_back(tmp);
   }
-  
   // 200 calculations of PCA
   for(int i = 0; i < 16; i++) {
     double eta = 0.001;
@@ -149,8 +148,6 @@ int main(int argc, char** argv) {
     }
   }
   
-  // TODO Save to file
-  
   ofstream file;
   file.open("data.csv");
   for(int g = 0; g < 400; g++) {
@@ -161,6 +158,17 @@ int main(int argc, char** argv) {
     file << endl;
   }
   file.close();
+  
+  ofstream file2;
+  file2.open("data2.csv");
+  for(int g = 0; g < 400; g++) {
+    for(int i = 0; i < 112*92; i++) {
+      file2 << images[g][i] << ", ";
+    }
+    file2 << ((int) (g / 10)) + 1;
+    file2 << endl;
+  }
+  file2.close();
   
   return 0;
 }
