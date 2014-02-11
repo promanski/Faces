@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
   
   // Initialise weights
   vector< vector< double > > weights;
-  for(int i = 0; i < 16; i++) {
+  for(int i = 0; i < 32; i++) {
     vector<double> tmp;
     for(int j = 0; j < 112*92; j++) {
       tmp.push_back(((((double) rand()*2 / RAND_MAX)) - 1)*0.1);
@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
   // Calculate first PCA
   for(int g = 0; g < 400; g++) {
     vector<double> tmp;
-    for(int i = 0; i < 16; i++) {
+    for(int i = 0; i < 32; i++) {
       double p = 0;
       for(int j = 0; j < 112*92; j++) {
         p += weights[i][j] * images[i][j];
@@ -115,9 +115,9 @@ int main(int argc, char** argv) {
     PCAs.push_back(tmp);
   }
   // 200 calculations of PCA
-  for(int i = 0; i < 16; i++) {
+  for(int i = 0; i < 32; i++) {
     double eta = 0.001;
-    for(int j = 0; j < 5; j++) {
+    for(int j = 0; j < 10; j++) {
       for(int g = 0; g < 400; g++) {
         double p = PCAs[g][i];
         
@@ -151,7 +151,7 @@ int main(int argc, char** argv) {
   ofstream file;
   file.open("data.csv");
   for(int g = 0; g < 400; g++) {
-    for(int i = 0; i < 16; i++) {
+    for(int i = 0; i < 32; i++) {
       file << PCAs[g][i] << ", ";
     }
     file << ((int) (g / 10)) + 1;
@@ -159,7 +159,8 @@ int main(int argc, char** argv) {
   }
   file.close();
   
-  ofstream file2;
+  // Przy odkomentowaniu ponizszego zakomentowac fragment z usuwaniem sredniej twarzy!!!
+  /*ofstream file2;
   file2.open("data2.csv");
   for(int g = 0; g < 400; g++) {
     for(int i = 0; i < 112*92; i++) {
@@ -168,7 +169,7 @@ int main(int argc, char** argv) {
     file2 << ((int) (g / 10)) + 1;
     file2 << endl;
   }
-  file2.close();
+  file2.close();*/
   
   return 0;
 }
